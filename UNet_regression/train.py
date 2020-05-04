@@ -32,8 +32,8 @@ parser.add_argument("--ckpt_dir", default="./checkpoint/inpainting/plain", type=
 parser.add_argument("--log_dir", default="./log/inpainting/plain", type=str, dest="log_dir")
 parser.add_argument("--result_dir", default="./result/inpainting/plain", type=str, dest="result_dir")
 
-parser.add_argument("--task", default="super_resolution", choices=["inpainting", "denoising", "super_resolution"], type=str, dest="task")
-parser.add_argument('--opts', nargs='+', default=['bilinear', 4], dest='opts')
+parser.add_argument("--task", default="denoising", choices=["inpainting", "denoising", "super_resolution"], type=str, dest="task")
+parser.add_argument('--opts', nargs='+', default=['random', 30], dest='opts')
 
 parser.add_argument("--ny", default=320, type=int, dest="ny")
 parser.add_argument("--nx", default=480, type=int, dest="nx")
@@ -119,7 +119,7 @@ if mode == 'train':
     # 그밖에 부수적인 variables 설정하기
     num_data_train = len(dataset_train)
     num_data_val = len(dataset_val)
-
+    cmap = None
     num_batch_train = np.ceil(num_data_train / batch_size)
     num_batch_val = np.ceil(num_data_val / batch_size)
 else:
@@ -130,14 +130,12 @@ else:
 
     # 그밖에 부수적인 variables 설정하기
     num_data_test = len(dataset_test)
-
+    cmap = None
     num_batch_test = np.ceil(num_data_test / batch_size)
 
 ## 네트워크 생성하기
 if network == "unet":
-    net = UNet(nch=nch, nker=nker, learning_type=learning_type).to(device)
-elif network == "hourglass":
-    net = Hourglass(nch=nch, nker=nker, learning_type=learning_type).to(device)
+    net = UNet(nch=nch, nker=nker,norm = 'bnorm', learning_type= learning_type).to(device)
 
 ## 손실함수 정의하기
 # fn_loss = nn.BCEWithLogitsLoss().to(device)
@@ -149,9 +147,7 @@ optim = torch.optim.Adam(net.parameters(), lr=lr)
 ## 그밖에 부수적인 functions 설정하기
 fn_tonumpy = lambda x: x.to('cpu').detach().numpy().transpose(0, 2, 3, 1)
 fn_denorm = lambda x, mean, std: (x * std) + mean
-fn_class = lambda x: 1.0 * (x > 0.5)
-
-cmap = None
+# fn_class = lambda x: 1.0 * (x > 0.5)
 
 ## Tensorboard 를 사용하기 위한 SummaryWriter 설정
 writer_train = SummaryWriter(log_dir=os.path.join(log_dir, 'train'))
