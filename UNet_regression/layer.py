@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+print('hello')
 
 # model에서 반복되는 layer를 묶어서 하나의 class로 선언
 # model 선언 할때 nn.Module을 상속 받기 때문에 계층을 맞춰주기 위해 CBR2d class도 nn.Module 상속 받음
