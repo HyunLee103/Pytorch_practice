@@ -91,7 +91,7 @@ class Pix2Pix_generator(nn.Module):
         dec6 = self.dec6(cat6)
         
         cat7 = torch.cat((dec6,enc2),dim=1)
-        dec7 = self.dec6(cat7)
+        dec7 = self.dec7(cat7)
         
         cat8 = torch.cat((dec7,enc1),dim=1)
         dec8 = self.dec8(cat8)
